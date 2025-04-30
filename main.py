@@ -63,3 +63,29 @@ def write_file(path: str, filename: str, content: str) -> str:
         return "Successfully wrote to file"
     except Exception as e:
         return f"Failed to write to file: {e}"
+
+@mcp.tool()
+def delete_file(path: str, filename: str) -> str:
+    """
+    Deletes the specified file from the given directory.
+
+    Parameters:
+        path (str): The directory containing the file.
+        filename (str): The name of the file to be deleted.
+
+    Returns:
+        str: A message indicating the result of the delete operation.
+    """
+    if not os.path.isdir(path):
+        return "Path does not exist"
+
+    full_path = os.path.join(path, filename)
+
+    if not os.path.isfile(full_path):
+        return "File does not exist"
+
+    try:
+        os.remove(full_path)
+        return "File deleted successfully"
+    except Exception as e:
+        return f"Failed to delete file: {e}"
