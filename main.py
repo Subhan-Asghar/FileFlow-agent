@@ -20,7 +20,7 @@ def create_file(path: str, filename: str) -> str:
         str: A message indicating whether the file was created successfully, 
              already exists (or is similar), or if the path is invalid.
     """
-    
+
     if not os.path.exists(path):
         return "Path does not exist"
 
@@ -35,3 +35,31 @@ def create_file(path: str, filename: str) -> str:
         return "File successfully created "
     except Exception as e:
         return f"Failed to create file: {e}"
+    
+@mcp.tool()
+def write_file(path: str, filename: str, content: str) -> str:
+    """
+    Writes content to a specified file if it exists in the given directory.
+
+    Parameters:
+        path (str): The directory containing the file.
+        filename (str): The name of the file to write to.
+        content (str): The content to be written into the file.
+
+    Returns:
+        str: A message indicating the result of the write operation.
+    """
+    if not os.path.isdir(path):
+        return "Path does not exist"
+
+    full_path = os.path.join(path, filename)
+
+    if not os.path.isfile(full_path):
+        return "File does not exist"
+
+    try:
+        with open(full_path, 'w') as file:
+            file.write(content)
+        return "Successfully wrote to file"
+    except Exception as e:
+        return f"Failed to write to file: {e}"
