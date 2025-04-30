@@ -1,6 +1,9 @@
-def main():
-    print("Hello from fileflow!")
+from mcp.server.fastmcp import FastMCP
+from Tools.Create_file import create_file
 
+mcp=FastMCP("FileFlow")
 
-if __name__ == "__main__":
-    main()
+@mcp.tool()
+def create_file(path: str, filename: str) -> str:
+    """Wrapper around the imported create_file function."""
+    return create_file(path, filename)
