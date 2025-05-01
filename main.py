@@ -89,3 +89,33 @@ def delete_file(path: str, filename: str) -> str:
         return "File deleted successfully"
     except Exception as e:
         return f"Failed to delete file: {e}"
+
+@mcp.tool()
+def create_dir(path: str, name: str) -> str:
+    """
+    Creates a new directory with the specified name at the given path.
+
+    Parameters:
+        path (str): The base directory where the new folder should be created.
+        name (str): The name of the folder to create.
+
+    Returns:
+        str: A message indicating the result of the directory creation operation.
+    """
+    
+    if not os.path.isdir(path):
+        return f"Invalid path: {path}"
+
+    full_path = os.path.join(path, name)
+    
+    if os.path.exists(full_path):
+        return f"Directory already exists at: {full_path}"
+
+    try:
+        os.makedirs(full_path)
+        return f"Directory created successfully at: {full_path}"
+    except OSError as e:
+        return f"Error creating directory: {e}"
+    
+
+
