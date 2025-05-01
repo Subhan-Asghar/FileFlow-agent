@@ -118,6 +118,7 @@ def create_dir(path: str, name: str) -> str:
     except OSError as e:
         return f"Error creating directory: {e}"
     
+@mcp.tool()
 def delete_dir(path: str, name: str) -> str:
     """
     Deletes a directory with the specified name from the given path.
@@ -145,6 +146,26 @@ def delete_dir(path: str, name: str) -> str:
     except OSError as e:
         return f"Error deleting directory: {e}"
 
+@mcp.tool()
+def search_file(path: str, name: str) -> str:
+    """
+    Searches for a file by name within the given directory and its subdirectories.
+
+    Parameters:
+        path (str): The base directory to start the search from.
+        name (str): The name of the file to search for.
+
+    Returns:
+        str: The full path to the file if found, otherwise a message indicating it wasn't found.
+    """
+    if not os.path.isdir(path):
+        return f"Invalid directory path: {path}"
+
+    for root, dir, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+
+    return f"File '{name}' not found in: {path}"
 
 
 
