@@ -1,4 +1,5 @@
 import os
+import shutil
 from mcp.server.fastmcp import FastMCP
 
 mcp=FastMCP("FileFlow")
@@ -116,6 +117,37 @@ def create_dir(path: str, name: str) -> str:
         return f"Directory created successfully at: {full_path}"
     except OSError as e:
         return f"Error creating directory: {e}"
+    
+def delete_dir(path: str, name: str) -> str:
+    """
+    Deletes a directory with the specified name from the given path.
+
+    Parameters:
+        path (str): The base directory where the target folder is located.
+        name (str): The name of the directory to be deleted.
+
+    Returns:
+        str: A message indicating the result of the delete operation.
+    """
+    if not os.path.isdir(path):
+        return f"Invalid base path: {path}"
+
+    target_dir = os.path.join(path, name)
+
+    if not os.path.exists(target_dir):
+        return f"Directory '{name}' does not exist at: {path}"
+
+    try:
+        shutil.rmtree(target_dir)
+        return f"Directory deleted successfully at: {target_dir}"
+    except PermissionError:
+        return f"Permission denied while deleting: {target_dir}"
+    except OSError as e:
+        return f"Error deleting directory: {e}"
+
+
+
+
     
 
 
