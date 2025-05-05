@@ -161,15 +161,17 @@ def search_file(path: str, name: str) -> str:
     """
     if not os.path.isdir(path):
         return f"Invalid directory path: {path}"
+    try:
+        for root, dir, files in os.walk(path):
+            if name in files:
+                return os.path.join(root, name)
 
-    for root, dir, files in os.walk(path):
-        if name in files:
-            return os.path.join(root, name)
+        return f"File '{name}' not found in: {path}"
 
-    return f"File '{name}' not found in: {path}"
+    except OSError as e:
+        return f"Error deleting directory: {e}"
 
 @mcp.tool()
-
 def meta_data(path:str,name:str)->str:
 
     """
@@ -193,21 +195,25 @@ def meta_data(path:str,name:str)->str:
     if not os.path.exists(full_path):
         return f"File does not exist: {name}"
 
-    stats = os.stat(full_path)
-    file_ext = os.path.splitext(name)[1]
-    file_name = os.path.splitext(name)[0]
+    try:
 
-    result = (
-        f"Full Path     : {full_path}\n"
-        f"File Name     : {file_name}\n"
-        f"Extension     : {file_ext}\n"
-        f"Size          : {stats.st_size} bytes\n"
-        f"Created       : {time.ctime(stats.st_ctime)}\n"
-        f"Last Modified : {time.ctime(stats.st_mtime)}\n"
-        f"Last Accessed : {time.ctime(stats.st_atime)}"
-    )
+        stats = os.stat(full_path)
+        file_ext = os.path.splitext(name)[1]
+        file_name = os.path.splitext(name)[0]
 
-    return result
+        result = (
+            f"Full Path     : {full_path}\n"
+            f"File Name     : {file_name}\n"
+            f"Extension     : {file_ext}\n"
+            f"Size          : {stats.st_size} bytes\n"
+            f"Created       : {time.ctime(stats.st_ctime)}\n"
+            f"Last Modified : {time.ctime(stats.st_mtime)}\n"
+            f"Last Accessed : {time.ctime(stats.st_atime)}"
+        )
+
+        return result
+    except OSError as e:
+        return f"Error deleting directory: {e}"
 
 
 
