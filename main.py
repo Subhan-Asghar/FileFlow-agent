@@ -250,6 +250,29 @@ def move_file(src_dir: str, name: str, dest_dir: str) -> str:
         return f"Failed to move file: {e}"
 
 
-    
+@mcp.tool()
+def move_dir(src_dir: str, dest_dir: str) -> str:
+    """
+    Moves a directory from the source location to the destination location.
 
+    Parameters:
+        src_dir (str): The path of the source directory to be moved.
+        dest_dir (str): The path of the destination directory where the source will be moved.
 
+    Returns:
+        str: A message indicating whether the directory was moved successfully.
+             Returns detailed error messages if the source or destination path is invalid,
+             or if the move operation fails.
+    """
+
+    if not os.path.isdir(src_dir):
+        return f"Source directory not found: {src_dir}"
+
+    if not os.path.isdir(dest_dir):
+        return f"Destination directory not found: {dest_dir}"
+
+    try:
+        shutil.move(src_dir, dest_dir)
+        return f"Directory '{os.path.basename(src_dir)}' successfully moved to '{dest_dir}'"
+    except Exception as e:
+        return f"Failed to move directory: {e}"    
