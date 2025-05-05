@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 from mcp.server.fastmcp import FastMCP
 
 mcp=FastMCP("FileFlow")
@@ -166,6 +167,47 @@ def search_file(path: str, name: str) -> str:
             return os.path.join(root, name)
 
     return f"File '{name}' not found in: {path}"
+
+@mcp.tool()
+
+def meta_data(path:str,name:str)->str:
+
+    """
+    Retrieves metadata for a specified file within a given directory.
+
+    Parameters:
+        path (str): The directory path where the file is expected to be located.
+        name (str): The name of the file for which metadata is to be retrieved.
+
+    Returns:
+        str: A formatted string containing metadata about the file such as its full path,
+             size, creation date, last modification date, and last accessed date.
+             Returns an error message if the path is invalid or the file doesn't exist.
+    """
+
+    if not os.path.isdir(path):
+        return f"Invalid directory path: {path}"
+
+    full_path=os.path.join(path,name)
+    
+    if not os.path.exists(full_path):
+        return f"File does not exist: {name}"
+
+    stats = os.stat(full_path)
+    file_ext = os.path.splitext(name)[1]
+    file_name = os.path.splitext(name)[0]
+
+    result = (
+        f"Full Path     : {full_path}\n"
+        f"File Name     : {file_name}\n"
+        f"Extension     : {file_ext}\n"
+        f"Size          : {stats.st_size} bytes\n"
+        f"Created       : {time.ctime(stats.st_ctime)}\n"
+        f"Last Modified : {time.ctime(stats.st_mtime)}\n"
+        f"Last Accessed : {time.ctime(stats.st_atime)}"
+    )
+
+    return result
 
 
 
