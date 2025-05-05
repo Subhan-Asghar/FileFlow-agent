@@ -215,6 +215,39 @@ def meta_data(path:str,name:str)->str:
     except OSError as e:
         return f"Error deleting directory: {e}"
 
+@mcp.tool()
+def move_file(src_dir: str, name: str, dest_dir: str) -> str:
+
+    """
+    Moves a specified file from the source directory to the destination directory.
+
+    Parameters:
+        src_dir (str): The path of the source directory containing the file.
+        name (str): The name of the file to be moved.
+        dest_dir (str): The path of the destination directory to move the file to.
+
+    Returns:
+        str: A message indicating success or failure of the file move operation.
+             Includes detailed error messages if directories or files are not found.
+    """
+    
+    if not os.path.isdir(src_dir):
+        return f"Source directory not found: {src_dir}"
+    
+
+    if not os.path.isdir(dest_dir):
+        return f"Destination directory not found: {dest_dir}"
+
+    src_file_path = os.path.join(src_dir, name)
+    
+    if not os.path.isfile(src_file_path):
+        return f"File not found: {name} in {src_dir}"
+    
+    try:
+        shutil.move(src_file_path, dest_dir)
+        return f"File '{name}' successfully moved to '{dest_dir}'"
+    except Exception as e:
+        return f"Failed to move file: {e}"
 
 
     
