@@ -1,6 +1,9 @@
 import os
 import shutil
 import time
+import subprocess
+import sys
+import threading
 from mcp.server.fastmcp import FastMCP
 
 mcp=FastMCP("FileFlow")
@@ -276,3 +279,66 @@ def move_dir(src_dir: str, dest_dir: str) -> str:
         return f"Directory '{os.path.basename(src_dir)}' successfully moved to '{dest_dir}'"
     except Exception as e:
         return f"Failed to move directory: {e}"    
+
+@mcp.tool()
+def terminal_tool(path: str, command: str) -> str:
+    """
+    Executes a terminal command in the specified directory, supporting interactive prompts.
+
+    This function supports real-time command execution and handles interactive CLI prompts
+    like 'Ok to proceed?', 'Do you want to continue?', or any (y/n) confirmation requests.
+
+    Parameters:
+        path (str): The directory where the command should be executed.
+        command (str): The shell command to execute.
+
+    Returns:
+        str: The full output of the command execution or an error message.
+    """
+    if not os.path.isdir(path):
+        return "Directory does not exist"
+    
+    os.chdir(path)
+
+    # Launch the process
+    try:
+        process = subprocess.Popen(
+            command,
+            shell=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+
+        output_lines = []
+
+        def handle_output():
+            for line in process.stdout:
+                print(line, end='')  # Stream output live
+                output_lines.append(line)
+
+                # Check for common confirmation prompts
+                if any(prompt in line.lower() for prompt in ['ok to proceed', 'do you want to continue', '(y/n)', '[y/n]']):
+                    user_input = input("Command is asking for confirmation. Proceed? (y/n): ").strip().lower()
+                    if user_input != 'y':
+                        process.stdin.write("n\n")
+                        process.stdin.flush()
+                        process.terminate()
+                        output_lines.append("Command aborted by user.")
+                        break
+                    else:
+                        process.stdin.write("y\n")
+                        process.stdin.flush()
+
+        # Run output handler in a separate thread
+        thread = threading.Thread(target=handle_output)
+        thread.start()
+        thread.join()
+
+        process.wait()
+        return "".join(output_lines)
+
+    except Exception as e:
+        return f"Exception occurred: {str(e)}"
